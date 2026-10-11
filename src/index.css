@@ -62,3 +62,26 @@ body {
   margin: 24px 0;
 }
 
+
+.casilla:disabled {
+  /* Algunos navegadores atenúan los campos desactivados */
+  opacity: 1;
+  -webkit-text-fill-color: currentColor;
+}
+
+.casilla:focus-visible,
+.boton:focus-visible {
+  outline: 3px solid #1a73e8;
+  outline-offset: 2px;
+}
+
+.boton {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  background: #1a1a1b;
+  color: #ffffff;
+  font: inherit;
+  font-weight: bold;
+  cursor: pointer;
+}
