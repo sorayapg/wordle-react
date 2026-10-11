@@ -24,17 +24,47 @@ function tableroVacio() {
   return tablero;
 }
 
-// Decide el color de una letra ya comprobada
-function estadoDe(letra, columna, solucion) {
-  // La letra está en la posición correcta
-  if (solucion[columna] === letra) return "correcta";
 
-  // La letra existe en la solución, pero en otra posición
-  if (solucion.includes(letra)) return "presente";
+// Calcula los colores de una fila completa en dos pasadas
+function estadosDeFila(fila, solucion) {
+  // Todas las letras empiezan como ausentes
+  const estados = Array(COLUMNAS).fill('ausente')
 
-  // La letra no aparece en la solución
-  return "ausente";
+  // Copiamos las letras de la solución para llevar su control
+  const disponibles = solucion.split('')
+
+  // PRIMERA PASADA: buscamos letras en la posición correcta
+  for (let c = 0; c < COLUMNAS; c++) {
+    if (fila[c] === solucion[c]) {
+      // Marcamos la letra como correcta
+      estados[c] = 'correcta'
+
+      // Esa letra ya está utilizada y no puede contarse otra vez
+      disponibles[c] = null
+    }
+  }
+
+  // SEGUNDA PASADA: buscamos letras presentes en otra posición
+  for (let c = 0; c < COLUMNAS; c++) {
+    // Las letras correctas ya están comprobadas
+    if (estados[c] === 'correcta') continue
+
+    // Buscamos la letra entre las que quedan disponibles
+    const posicion = disponibles.indexOf(fila[c])
+
+    if (posicion !== -1) {
+      // La letra existe, pero está en otra posición
+      estados[c] = 'presente'
+
+      // La retiramos para evitar contarla dos veces
+      disponibles[posicion] = null
+    }
+  }
+
+  // Devolvemos los cinco estados de la fila
+  return estados
 }
+
 
 function App() {
   // Guarda las letras introducidas en el tablero
@@ -43,8 +73,9 @@ function App() {
   // Indica la fila en la que estamos jugando
   const [filaActual, setFilaActual] = useState(0);
 
-  // Guarda la palabra secreta de la partida actual
-  const [solucion, setSolucion] = useState(palabraAleatoria);
+  // Guarda la palabra secreta elegida aleatoriamente para cada partida
+  const [solucion, setSolucion] = useState(palabraAleatoria)
+
   
   // Guarda el mensaje de aviso cuando el intento está incompleto
   const [aviso, setAviso] = useState('')
@@ -131,8 +162,13 @@ function App() {
             {fila.map((letra, c) => (
               <Casilla
                 key={c}
-                letra={letra}
-                estado={f < filaActual ? estadoDe(letra, c, solucion) : ""}
+                letra={letra}                
+                estado={
+                  f < filaActual
+                    // Calcula los estados de toda la fila y obtiene el de esta casilla
+                    ? estadosDeFila(fila, solucion)[c]
+                    : ''
+                }
                 activa={!terminada && f === filaActual}
                 onCambio={(evento) => cambiarLetra(f, c, evento)}
               />
