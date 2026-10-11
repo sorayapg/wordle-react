@@ -65,6 +65,16 @@ function App() {
     setFilaActual(filaActual + 1)
   }
 
+  // Reinicia el juego para comenzar una nueva partida
+  function nuevaPartida() {
+    // Vacía todas las casillas del tablero
+    setIntentos(tableroVacio())
+
+    // Vuelve a activar la primera fila (índice 0)
+    setFilaActual(0)
+  }
+
+
   return (
     <form className="juego" onSubmit={comprobar}>
       <h1>Wordle</h1>
@@ -83,20 +93,33 @@ function App() {
             ))}
           </div>
         ))}
-      </div>
-
+      </div>    
       
       {terminada ? (
-        <p className="mensaje" role="status">
-          {ganada
-            ? '¡Enhorabuena, has acertado!'
-            : `La palabra era ${SOLUCION}`}
-        </p>
+        <>
+          {/* Mostramos el resultado final de la partida */}
+          <p className="mensaje" role="status">
+            {ganada
+              ? '¡Enhorabuena, has acertado!'
+              : `La palabra era ${SOLUCION}`}
+          </p>
+
+          {/* Permite comenzar una nueva partida sin recargar la página */}
+          <button
+            className="boton"
+            type="button"
+            onClick={nuevaPartida}
+          >
+            Nueva partida
+          </button>
+        </>
       ) : (
+        // Mientras la partida esté activa, mostramos el botón Comprobar
         <button className="boton" type="submit">
           Comprobar
         </button>
       )}
+
 
     </form>
   )
