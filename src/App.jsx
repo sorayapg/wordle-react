@@ -45,6 +45,10 @@ function App() {
 
   // Guarda la palabra secreta de la partida actual
   const [solucion, setSolucion] = useState(palabraAleatoria);
+  
+  // Guarda el mensaje de aviso cuando el intento está incompleto
+  const [aviso, setAviso] = useState('')
+
 
   // Obtiene la última palabra comprobada
   const ultimo = filaActual > 0 ? intentos[filaActual - 1].join("") : "";
@@ -78,19 +82,27 @@ function App() {
     if (letra !== "") evento.target.nextElementSibling?.focus();
   }
 
+  
   // Comprueba el intento cuando pulsamos el botón o Enter
   function comprobar(evento) {
     // Evita que el navegador recargue la página
-    evento.preventDefault();
+    evento.preventDefault()
 
     // No permite comprobar si la partida ha terminado
-    if (terminada) return;
+    if (terminada) return
 
-    // No permite avanzar si faltan letras
-    if (intentos[filaActual].includes("")) return;
+    // Comprueba si faltan letras en la fila actual
+    if (intentos[filaActual].includes('')) {
+      // Muestra un aviso al jugador
+      setAviso('Faltan letras')
+      return
+    }
+
+    // Elimina cualquier aviso anterior
+    setAviso('')
 
     // Activa la siguiente fila
-    setFilaActual(filaActual + 1);
+    setFilaActual(filaActual + 1)
   }
 
   // Reinicia el juego para comenzar una nueva partida
@@ -103,6 +115,9 @@ function App() {
 
     // Selecciona una nueva palabra secreta
     setSolucion(palabraAleatoria());
+
+    // Limpia cualquier aviso de la partida anterior
+    setAviso('')
   }
 
   return (
@@ -125,6 +140,13 @@ function App() {
           </div>
         ))}
       </div>
+      
+      {/* Muestra un aviso si la fila está incompleta */}
+      {aviso && (
+        <p className="mensaje" role="status">
+          {aviso}
+        </p>
+      )}
 
       {/* Muestra el resultado final o el botón Comprobar */}
       {terminada ? (
