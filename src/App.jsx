@@ -4,6 +4,7 @@ import Casilla from './components/Casilla.jsx'
 
 const FILAS = 6
 const COLUMNAS = 5
+const SOLUCION = 'PERRO'
 
 // Crea un tablero vacío: 6 filas de 5 letras en blanco
 function tableroVacio() {
@@ -12,6 +13,13 @@ function tableroVacio() {
     tablero.push(Array(COLUMNAS).fill(''))
   }
   return tablero
+}
+
+// Decide el color de una letra ya comprobada
+function estadoDe(letra, columna) {
+  if (SOLUCION[columna] === letra) return 'correcta'
+  if (SOLUCION.includes(letra)) return 'presente'
+  return 'ausente'
 }
 
 function App() {
@@ -46,6 +54,7 @@ function App() {
   return (
     <form className="juego" onSubmit={comprobar}>
       <h1>Wordle</h1>
+
       <div className="tablero">
         {intentos.map((fila, f) => (
           <div className="fila" key={f}>
@@ -53,6 +62,7 @@ function App() {
               <Casilla
                 key={c}
                 letra={letra}
+                estado={f < filaActual ? estadoDe(letra, c) : ''}
                 activa={!terminada && f === filaActual}
                 onCambio={(evento) => cambiarLetra(f, c, evento)}
               />
@@ -60,6 +70,7 @@ function App() {
           </div>
         ))}
       </div>
+
       <button className="boton" type="submit">
         Comprobar
       </button>
