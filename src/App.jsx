@@ -1,6 +1,6 @@
 
-import { useState } from 'react'
-import Casilla from './components/Casilla.jsx'
+import { useEffect, useState } from 'react';
+import Casilla from './components/Casilla.jsx';
 
 const FILAS = 6
 const COLUMNAS = 5
@@ -30,6 +30,12 @@ function App() {
   const ultimo = filaActual > 0 ? intentos[filaActual - 1].join('') : ''
   const ganada = ultimo === SOLUCION
   const terminada = ganada || filaActual === FILAS
+  
+  useEffect(() => {
+    // Lleva el cursor a la primera casilla en la que se puede escribir
+    document.querySelector('.casilla:enabled')?.focus()
+  }, [filaActual])
+
 
 
   function cambiarLetra(f, c, evento) {
@@ -42,6 +48,10 @@ function App() {
     const copia = intentos.map((fila) => [...fila])
     copia[f][c] = letra
     setIntentos(copia)
+    
+    // Después de escribir una letra, pasamos a la casilla siguiente
+    if (letra !== '') evento.target.nextElementSibling?.focus()
+
   }
 
   function comprobar(evento) {
