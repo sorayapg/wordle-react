@@ -1,84 +1,115 @@
+import { useEffect, useState } from "react";
+import Casilla from "./components/Casilla.jsx";
 
-import { useEffect, useState } from 'react';
-import Casilla from './components/Casilla.jsx';
+const FILAS = 6;
+const COLUMNAS = 5;
 
-const FILAS = 6
-const COLUMNAS = 5
-const SOLUCION = 'PERRO'
+// Lista de posibles soluciones, todas de cinco letras y sin tildes
+const PALABRAS = ["PERRO", "GATOS", "LIBRO", "PLAYA", "NUBES"];
+
+// Selecciona una palabra aleatoria de la lista
+function palabraAleatoria() {
+  const indice = Math.floor(Math.random() * PALABRAS.length);
+  return PALABRAS[indice];
+}
 
 // Crea un tablero vacío: 6 filas de 5 letras en blanco
 function tableroVacio() {
-  const tablero = []
+  const tablero = [];
+
   for (let f = 0; f < FILAS; f++) {
-    tablero.push(Array(COLUMNAS).fill(''))
+    tablero.push(Array(COLUMNAS).fill(""));
   }
-  return tablero
+
+  return tablero;
 }
 
 // Decide el color de una letra ya comprobada
-function estadoDe(letra, columna) {
-  if (SOLUCION[columna] === letra) return 'correcta'
-  if (SOLUCION.includes(letra)) return 'presente'
-  return 'ausente'
+function estadoDe(letra, columna, solucion) {
+  // La letra está en la posición correcta
+  if (solucion[columna] === letra) return "correcta";
+
+  // La letra existe en la solución, pero en otra posición
+  if (solucion.includes(letra)) return "presente";
+
+  // La letra no aparece en la solución
+  return "ausente";
 }
 
 function App() {
-  const [intentos, setIntentos] = useState(tableroVacio())
-  const [filaActual, setFilaActual] = useState(0)
-  
-  // El último intento comprobado, como texto: 'PERRO'
-  const ultimo = filaActual > 0 ? intentos[filaActual - 1].join('') : ''
-  const ganada = ultimo === SOLUCION
-  const terminada = ganada || filaActual === FILAS
-  
+  // Guarda las letras introducidas en el tablero
+  const [intentos, setIntentos] = useState(tableroVacio());
+
+  // Indica la fila en la que estamos jugando
+  const [filaActual, setFilaActual] = useState(0);
+
+  // Guarda la palabra secreta de la partida actual
+  const [solucion, setSolucion] = useState(palabraAleatoria);
+
+  // Obtiene la última palabra comprobada
+  const ultimo = filaActual > 0 ? intentos[filaActual - 1].join("") : "";
+
+  // Comprueba si hemos acertado la palabra secreta
+  const ganada = ultimo === solucion;
+
+  // La partida termina si acertamos o agotamos los seis intentos
+  const terminada = ganada || filaActual === FILAS;
+
+  // Coloca automáticamente el cursor en la primera casilla activa
   useEffect(() => {
-    // Lleva el cursor a la primera casilla en la que se puede escribir
-    document.querySelector('.casilla:enabled')?.focus()
-  }, [filaActual])
+    document.querySelector(".casilla:enabled")?.focus();
+  }, [filaActual]);
 
-
-
+  // Actualiza la letra escrita en una casilla
   function cambiarLetra(f, c, evento) {
-    const letra = evento.target.value.toUpperCase()
+    const letra = evento.target.value.toUpperCase();
 
-    // Solo aceptamos una letra, o nada si se ha borrado
-    if (!/^[A-ZÑ]?$/.test(letra)) return
+    // Solo permite una letra o un campo vacío
+    if (!/^[A-ZÑ]?$/.test(letra)) return;
 
-    // Copiamos el tablero, cambiamos la copia y la guardamos
-    const copia = intentos.map((fila) => [...fila])
-    copia[f][c] = letra
-    setIntentos(copia)
-    
-    // Después de escribir una letra, pasamos a la casilla siguiente
-    if (letra !== '') evento.target.nextElementSibling?.focus()
+    // Copia el tablero para actualizarlo sin modificar el original
+    const copia = intentos.map((fila) => [...fila]);
 
+    // Guarda la letra en su fila y columna
+    copia[f][c] = letra;
+    setIntentos(copia);
+
+    // Después de escribir una letra, pasa a la casilla siguiente
+    if (letra !== "") evento.target.nextElementSibling?.focus();
   }
 
+  // Comprueba el intento cuando pulsamos el botón o Enter
   function comprobar(evento) {
     // Evita que el navegador recargue la página
-    evento.preventDefault()
-    if (terminada) return
+    evento.preventDefault();
 
-    // No se puede comprobar una fila incompleta
-    if (intentos[filaActual].includes('')) return
+    // No permite comprobar si la partida ha terminado
+    if (terminada) return;
 
-    setFilaActual(filaActual + 1)
+    // No permite avanzar si faltan letras
+    if (intentos[filaActual].includes("")) return;
+
+    // Activa la siguiente fila
+    setFilaActual(filaActual + 1);
   }
 
   // Reinicia el juego para comenzar una nueva partida
   function nuevaPartida() {
     // Vacía todas las casillas del tablero
-    setIntentos(tableroVacio())
+    setIntentos(tableroVacio());
 
-    // Vuelve a activar la primera fila (índice 0)
-    setFilaActual(0)
+    // Vuelve a activar la primera fila
+    setFilaActual(0);
+
+    // Selecciona una nueva palabra secreta
+    setSolucion(palabraAleatoria());
   }
-
 
   return (
     <form className="juego" onSubmit={comprobar}>
       <h1>Wordle</h1>
 
+      {/* Dibuja las seis filas del tablero */}
       <div className="tablero">
         {intentos.map((fila, f) => (
           <div className="fila" key={f}>
@@ -86,43 +117,37 @@ function App() {
               <Casilla
                 key={c}
                 letra={letra}
-                estado={f < filaActual ? estadoDe(letra, c) : ''}
+                estado={f < filaActual ? estadoDe(letra, c, solucion) : ""}
                 activa={!terminada && f === filaActual}
                 onCambio={(evento) => cambiarLetra(f, c, evento)}
               />
             ))}
           </div>
         ))}
-      </div>    
-      
+      </div>
+
+      {/* Muestra el resultado final o el botón Comprobar */}
       {terminada ? (
         <>
-          {/* Mostramos el resultado final de la partida */}
+          {/* Mensaje de victoria o derrota */}
           <p className="mensaje" role="status">
             {ganada
-              ? '¡Enhorabuena, has acertado!'
-              : `La palabra era ${SOLUCION}`}
+              ? "¡Enhorabuena, has acertado!"
+              : `La palabra era ${solucion}`}
           </p>
 
-          {/* Permite comenzar una nueva partida sin recargar la página */}
-          <button
-            className="boton"
-            type="button"
-            onClick={nuevaPartida}
-          >
+          {/* Permite comenzar otra partida */}
+          <button className="boton" type="button" onClick={nuevaPartida}>
             Nueva partida
           </button>
         </>
       ) : (
-        // Mientras la partida esté activa, mostramos el botón Comprobar
         <button className="boton" type="submit">
           Comprobar
         </button>
       )}
-
-
     </form>
-  )
+  );
 }
 
-export default App
+export default App;
