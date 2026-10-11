@@ -25,8 +25,12 @@ function estadoDe(letra, columna) {
 function App() {
   const [intentos, setIntentos] = useState(tableroVacio())
   const [filaActual, setFilaActual] = useState(0)
+  
+  // El último intento comprobado, como texto: 'PERRO'
+  const ultimo = filaActual > 0 ? intentos[filaActual - 1].join('') : ''
+  const ganada = ultimo === SOLUCION
+  const terminada = ganada || filaActual === FILAS
 
-  const terminada = filaActual === FILAS
 
   function cambiarLetra(f, c, evento) {
     const letra = evento.target.value.toUpperCase()
@@ -71,9 +75,19 @@ function App() {
         ))}
       </div>
 
-      <button className="boton" type="submit">
-        Comprobar
-      </button>
+      
+      {terminada ? (
+        <p className="mensaje" role="status">
+          {ganada
+            ? '¡Enhorabuena, has acertado!'
+            : `La palabra era ${SOLUCION}`}
+        </p>
+      ) : (
+        <button className="boton" type="submit">
+          Comprobar
+        </button>
+      )}
+
     </form>
   )
 }
