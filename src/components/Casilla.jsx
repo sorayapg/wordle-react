@@ -8,6 +8,7 @@ function Casilla({ letra, estado = '', activa, onCambio }) {
       disabled={!activa}
       onChange={onCambio}
     />
+    
   )
 }
 
