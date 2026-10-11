@@ -1,11 +1,11 @@
 
-function Casilla({ letra, estado = '' }) {
+function Casilla({ letra, estado = '', onCambio }) {
   return (
     <input
       className={`casilla ${estado}`}
       value={letra}
       maxLength={1}
-      readOnly
+      onChange={onCambio}
     />
   )
 }
