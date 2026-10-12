@@ -27,7 +27,7 @@ function tableroVacio() {
 }
 
 // Calcula los colores de una fila completa en dos pasadas
-function estadosDeFila(fila, solucion) {
+export function estadosDeFila(fila, solucion) {
   // Todas las letras empiezan como ausentes
   const estados = Array(COLUMNAS).fill('ausente')
 
