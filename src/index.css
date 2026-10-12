@@ -91,3 +91,33 @@ body {
   font-size: 1.2rem;
   font-weight: bold;
 }
+
+
+/* Contenedor de cada casilla y su símbolo de accesibilidad */
+.contenedor-casilla {
+  position: relative;
+  display: inline-flex;
+  width: 58px;
+  height: 58px;
+}
+
+/* Símbolo que indica el resultado sin depender del color */
+.simbolo-casilla {
+  position: absolute;
+  right: 3px;
+  bottom: 2px;
+
+  /* Evita que el símbolo interfiera con el ratón */
+  pointer-events: none;
+
+  /* Lo mantiene visible sobre la casilla */
+  font-size: 0.8rem;
+  font-weight: bold;
+  line-height: 1;
+  color: #ffffff;
+}
+
+/* En las casillas amarillas usamos un símbolo oscuro */
+.contenedor-casilla:has(.casilla.presente) .simbolo-casilla {
+  color: #1a1a1b;
+}
