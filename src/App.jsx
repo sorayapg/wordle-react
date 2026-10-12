@@ -108,9 +108,20 @@ function App() {
     // Guarda la letra en su fila y columna
     copia[f][c] = letra;
     setIntentos(copia);
+    
+    // Después de escribir una letra, avanzamos a la siguiente casilla
+    if (letra !== '') {
+      // Buscamos el contenedor de la casilla actual
+      const contenedor = evento.target.closest('.contenedor-casilla')
 
-    // Después de escribir una letra, pasa a la casilla siguiente
-    if (letra !== "") evento.target.nextElementSibling?.focus();
+      // Localizamos el input del siguiente contenedor
+      const siguiente = contenedor?.nextElementSibling?.querySelector('input')
+
+      // Movemos el cursor si existe una casilla siguiente
+      siguiente?.focus()
+    }
+
+    
   }
 
   
@@ -162,10 +173,20 @@ function App() {
             {fila.map((letra, c) => (
               <Casilla
                 key={c}
-                letra={letra}                
+                letra={letra}
+                etiqueta={`Fila ${f + 1}, columna ${c + 1}, ${
+                  letra ? `letra ${letra}` : 'vacía'
+                }, ${
+                  f < filaActual
+                    ? {
+                        correcta: 'posición correcta',
+                        presente: 'letra presente en otra posición',
+                        ausente: 'letra ausente'
+                      }[estadosDeFila(fila, solucion)[c]]
+                    : 'sin comprobar'
+                }`}
                 estado={
                   f < filaActual
-                    // Calcula los estados de toda la fila y obtiene el de esta casilla
                     ? estadosDeFila(fila, solucion)[c]
                     : ''
                 }
@@ -176,6 +197,11 @@ function App() {
           </div>
         ))}
       </div>
+      
+      {/* Leyenda accesible: explica los resultados sin depender solo del color */}
+      <p className="leyenda">
+        ✓ Posición correcta · ~ Otra posición · ✕ Letra ausente
+      </p>
       
       {/* Muestra un aviso si la fila está incompleta */}
       {aviso && (
