@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import Casilla from "./components/Casilla.jsx";
+import Teclado from './components/Teclado.jsx';
+
 
 const FILAS = 6;
 const COLUMNAS = 5;
@@ -23,7 +25,6 @@ function tableroVacio() {
 
   return tablero;
 }
-
 
 // Calcula los colores de una fila completa en dos pasadas
 function estadosDeFila(fila, solucion) {
@@ -73,13 +74,14 @@ function App() {
   // Indica la fila en la que estamos jugando
   const [filaActual, setFilaActual] = useState(0);
 
+  // Guarda la columna en la que escribirá el teclado en pantalla
+  const [columnaActual, setColumnaActual] = useState(0)
+
   // Guarda la palabra secreta elegida aleatoriamente para cada partida
   const [solucion, setSolucion] = useState(palabraAleatoria)
 
-  
   // Guarda el mensaje de aviso cuando el intento está incompleto
   const [aviso, setAviso] = useState('')
-
 
   // Obtiene la última palabra comprobada
   const ultimo = filaActual > 0 ? intentos[filaActual - 1].join("") : "";
@@ -123,6 +125,35 @@ function App() {
 
     
   }
+  
+  // Escribe una letra al pulsar el teclado en pantalla
+  function escribirLetra(letra) {
+    // No permitimos escribir si la partida ha terminado
+    if (terminada) return
+
+    // Buscamos la primera casilla vacía de la fila actual
+    const columna = intentos[filaActual].findIndex(
+      (casilla) => casilla === ''
+    )
+
+    // Si la fila está completa, no añadimos más letras
+    if (columna === -1) return
+
+    // Creamos una copia del tablero para actualizarlo
+    const nuevosIntentos = intentos.map((fila) => [...fila])
+
+    // Colocamos la letra en la casilla encontrada
+    nuevosIntentos[filaActual][columna] = letra
+
+    // Actualizamos el tablero
+    setIntentos(nuevosIntentos)
+
+    // Guardamos la siguiente columna de escritura
+    setColumnaActual(Math.min(columna + 1, COLUMNAS - 1))
+
+    // Quitamos cualquier aviso anterior
+    setAviso('')
+  }
 
   
   // Comprueba el intento cuando pulsamos el botón o Enter
@@ -154,6 +185,10 @@ function App() {
 
     // Vuelve a activar la primera fila
     setFilaActual(0);
+    
+    // Vuelve a la primera columna del teclado en pantalla
+    setColumnaActual(0);
+
 
     // Selecciona una nueva palabra secreta
     setSolucion(palabraAleatoria());
@@ -203,6 +238,12 @@ function App() {
         ✓ Posición correcta · ~ Otra posición · ✕ Letra ausente
       </p>
       
+      {/* Teclado en pantalla para introducir letras con el ratón */}
+      {!terminada && (
+        <Teclado onLetra={escribirLetra} />
+      )}
+
+      
       {/* Muestra un aviso si la fila está incompleta */}
       {aviso && (
         <p className="mensaje" role="status">
@@ -225,11 +266,25 @@ function App() {
             Nueva partida
           </button>
         </>
+      
       ) : (
-        <button className="boton" type="submit">
-          Comprobar
-        </button>
+        <>
+          {/* Comprueba la palabra introducida */}
+          <button className="boton" type="submit">
+            Comprobar
+          </button>
+
+          {/* Permite reiniciar la partida en cualquier momento */}
+          <button
+            className="boton"
+            type="button"
+            onClick={nuevaPartida}
+          >
+            Nueva partida
+          </button>
+        </>
       )}
+
     </form>
   );
 }
