@@ -121,3 +121,50 @@ body {
 .contenedor-casilla:has(.casilla.presente) .simbolo-casilla {
   color: #1a1a1b;
 }
+
+/* Contenedor principal del teclado en pantalla */
+.teclado {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin: 20px 0;
+}
+
+/* Distribuye las letras de cada fila horizontalmente */
+.teclado-fila {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+
+/* Estilo de los botones que representan cada letra */
+.tecla {
+  width: 38px;
+  height: 48px;
+  border: none;
+  border-radius: 5px;
+  background-color: #d3d6da;
+  color: #1a1a1b;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Cambia el aspecto cuando pasamos el ratón */
+.tecla:hover {
+  background-color: #b0b4b9;
+}
+
+/* Facilita la navegación mediante el teclado físico */
+.tecla:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/* Separa los botones de Comprobar y Nueva partida */
+.boton + .boton {
+  margin-left: 12px;
+}
+
+
